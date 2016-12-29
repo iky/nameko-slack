@@ -56,36 +56,15 @@ def make_message_event():
 
 
 @pytest.fixture
-def events():
+def events(make_message_event):
     return [
         {'type': 'hello'},
         {'type': 'presence_change', 'presence': 'active', 'user': 'U11'},
-        {
-            'type': 'message',
-            'text': 'spam ham',
-            'user': 'U11',
-            'channel': 'D11',
-            'team': 'T11',
-            'ts': '1480798992.000002',
-        },
+        make_message_event(text='spam ham'),
         {'type': 'presence_change', 'presence': 'away', 'user': 'U00'},
-        {
-            'type': 'message',
-            'text': 'ham spam',
-            'user': 'U11',
-            'channel': 'D11',
-            'team': 'T11',
-            'ts': '1480798992.000002',
-        },
+        make_message_event(text='ham spam'),
         {},  # emtpy event, no type specified
-        {
-            'type': 'message',
-            'text': 'spam egg',
-            'user': 'U11',
-            'channel': 'D11',
-            'team': 'T11',
-            'ts': '1480798992.000002',
-        },
+        make_message_event(text='spam egg'),
     ]
 
 
