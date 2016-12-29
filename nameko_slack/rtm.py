@@ -7,10 +7,6 @@ from slackclient import SlackClient
 from nameko_slack import constants
 
 
-class SlackError(Exception):
-    pass
-
-
 class SlackRTMClient(SharedExtension, ProviderCollector):
     """
     Slack Real Time Messaging API Client
