@@ -19,6 +19,8 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
 
         self.read_interval = 1
 
+        self.token = None
+
         self._client = None
         self._gt = None
         self._handlers = set()
@@ -26,16 +28,11 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
     def setup(self):
         config = self.container.config.get('SLACK', {})
         self.token = config.get('TOKEN')
-        # TODO replace test token with proper oauth
 
     def start(self):
         self._register_handlers()
         self._connect()
         self._gt = self.container.spawn_managed_thread(self.run)
-
-    def stop(self):
-        # should anything be done on when stopping the contaner?
-        pass
 
     def run(self):
         while True:
