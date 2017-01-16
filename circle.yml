@@ -6,3 +6,12 @@ dependencies:
   override:
     - pip install tox tox-pyenv
     - pyenv local 2.7.10 3.4.3
+    - pip install -U pip setuptools
+    - pip install -U -e ".[dev]"
+
+test:
+  override:
+    - make test
+    - tox
+  post:
+    - coverage html -d $CIRCLE_ARTIFACTS
