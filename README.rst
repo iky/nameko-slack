@@ -68,6 +68,13 @@ Finally, run the service:
 .. code::
 
     $ SLACK_BOT_TOKEN=xoxb-abc-1232 nameko run --config ./config.yaml service
+    starting services: some-service
+    {'type': 'hello'}
+    {'type': 'presence_change', 'user': 'ABCDE1234', 'presence': 'active'}
+    {'type': 'user_typing', 'user': 'ABCDE1234', 'channel': 'ABCDE1234'}
+    {'type': 'message', 'text': 'spam', 'channel': 'ABCDE1234', 'user': 'ABC...
+    {'type': 'presence_change', 'user': 'ABCDE1234', 'presence': 'active'}
+    ...
 
 
 More Examples
