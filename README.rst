@@ -3,7 +3,7 @@ Slack Extensions for Nameko
 ===========================
 
 `Nameko`_ extension for interaction with `Slack APIs`_. Uses
-`Slack Developer Kit for Python`_
+`Slack Developer Kit for Python`_.
 
 .. _Nameko: http://nameko.readthedocs.org
 .. _Slack APIs: https://api.slack.com
@@ -13,31 +13,39 @@ Slack Extensions for Nameko
 Real Time Messaging Client
 ==========================
 
-The RTM extension is a Websocket client for Sack's `Real Time Messaging API`_
-that allows you to receive events from Slack in real time. The `rtm` module
-contains for handling such events.
+The RTM extension is a Websocket client for Slack's `Real Time Messaging API`_
+that allows you to receive events from Slack in real time. The ``rtm`` module
+contains two Nameko entrypoints for handling such events - ``handle_event`` and
+``handle_message``.
 
 .. _Real Time Messaging API: https://api.slack.com/rtm
 
 
-Provide Slack bot API token in your Nameko service config file::
+Usage
+-----
+
+Provide Slack bot API token in your Nameko service config file:
+
+.. code:: yaml
 
     # config.yml
 
     SLACK:
         TOKEN: "xoxb-abc-1232"
 
-Or using environment variable within your config::
+Or using environment variable within your config:
+
+.. code:: yaml
 
     # config.yml
 
     SLACK:
         TOKEN: ${SLACK_BOT_TOKEN}
 
-nameko run --config ./foobar.yaml
-
 Define your service with an entrypoint which will listen for and fire on any
-event coming from Slack::
+event coming from Slack:
+
+.. code:: python
 
     # service.py
 
@@ -51,34 +59,72 @@ event coming from Slack::
         def on_any_event(self, event):
             print(event)
 
-Finally, run the service::
+Finally, run the service:
+
+.. code::
 
     $ SLACK_BOT_TOKEN=xoxb-abc-1232 nameko run --config ./config.yaml service
 
-Listen for events of a particular type::
 
-    @rtm.handle_event(rtm.Event.PRESENCE_CHANGE)
-    def on_presence_change(self, event):
-        pass
+More Examples
+-------------
 
-Listen for any message type event::
+Listen for events of a particular type:
 
-    @rtm.handle_message
-    def on_any_message(self, event, message):
-        pass
+.. code:: python
 
-Use regular expressions to fire on matching messages only::
+    from nameko_slack import rtm
 
-    @rtm.handle_message('^spam')
-    def on_message_starting_with(self, event, message):
-        pass
+    class Service:
 
-Parse message and pass ``args`` or ``kwargs`` straight to entrypoint::
+        name = 'some-service'
 
-    @rtm.handle_message('^spam (\w*)'):
-    def on_message(self, event, message, egg):
-        pass
+        @rtm.handle_event(rtm.Event.PRESENCE_CHANGE)
+        def on_presence_change(self, event):
+            pass
 
-    @rtm.handle_message('^spam (?P<ham>\w+)'):
-    def on_message(self, event, message, ham=None):
-        pass
+Listen for any message type event:
+
+.. code:: python
+
+    from nameko_slack import rtm
+
+    class Service:
+
+        name = 'some-service'
+
+        @rtm.handle_message
+        def on_any_message(self, event, message):
+            pass
+
+Use regular expressions to fire on matching messages only:
+
+.. code:: python
+
+    from nameko_slack import rtm
+
+    class Service:
+
+        name = 'some-service'
+
+        @rtm.handle_message('^spam')
+        def on_message_starting_with(self, event, message):
+            pass
+
+Parse message and pass ``args`` or ``kwargs`` straight to entrypoint:
+
+.. code:: python
+
+    from nameko_slack import rtm
+
+    class Service:
+
+        name = 'some-service'
+
+        @rtm.handle_message('^spam (\w*)')
+        def on_message(self, event, message, egg):
+            pass
+
+        @rtm.handle_message('^spam (?P<ham>\w+)')
+        def on_message(self, event, message, ham=None):
+            pass
