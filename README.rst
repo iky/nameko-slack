@@ -133,9 +133,9 @@ Parse message and pass ``args`` or ``kwargs`` straight to entrypoint:
         name = 'some-service'
 
         @rtm.handle_message('^spam (\w*)')
-        def on_message(self, event, message, egg):
+        def on_spam(self, event, message, egg):
             pass
 
-        @rtm.handle_message('^spam (?P<ham>\w+)')
-        def on_message(self, event, message, ham=None):
+        @rtm.handle_message('^egg (?P<ham>\w+)')
+        def on_egg(self, event, message, ham=None):
             pass
