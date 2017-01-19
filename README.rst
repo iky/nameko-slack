@@ -90,7 +90,7 @@ Listen for events of a particular type:
 
         name = 'some-service'
 
-        @rtm.handle_event(rtm.Event.PRESENCE_CHANGE)
+        @rtm.handle_event('presence_change')
         def on_presence_change(self, event):
             pass
 

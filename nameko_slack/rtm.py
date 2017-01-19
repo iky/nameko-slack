@@ -4,7 +4,8 @@ import eventlet
 from nameko.extensions import Entrypoint, ProviderCollector, SharedExtension
 from slackclient import SlackClient
 
-from nameko_slack import constants
+
+EVENT_TYPE_MESSAGE = 'message'
 
 
 class SlackRTMClient(SharedExtension, ProviderCollector):
@@ -88,7 +89,7 @@ class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
             self.message_pattern = None
 
     def handle_event(self, event):
-        if event.get('type') == constants.EventType.message.value:
+        if event.get('type') == EVENT_TYPE_MESSAGE:
             if self.message_pattern:
                 match = self.message_pattern.match(event.get('text', ''))
                 if match:

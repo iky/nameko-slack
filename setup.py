@@ -12,7 +12,6 @@ setup(
     url='http://github.com/iky/nameko-slack',
     py_modules=['nameko_slack'],
     install_requires=[
-        "enum34==1.1.6",
         "nameko>=2.4.4",
         "slackclient==1.0.4",
     ],
