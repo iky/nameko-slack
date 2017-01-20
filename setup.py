@@ -13,7 +13,7 @@ setup(
     py_modules=['nameko_slack'],
     install_requires=[
         "nameko>=2.4.4",
-        "slackclient==1.0.4",
+        "slackclient>=1.0.4",
     ],
     extras_require={
         'dev': [
