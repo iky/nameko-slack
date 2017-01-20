@@ -124,7 +124,7 @@ class TestHandleEvents:
             ] ==
             tracker.handle_event.call_args_list)
 
-    def test_handle_message_starting_with(
+    def test_handle_message_matching_regex(
         self, make_message_event, service_runner, tracker
     ):
 
@@ -156,7 +156,7 @@ class TestHandleEvents:
             ] ==
             tracker.handle_event.call_args_list)
 
-    def test_handle_message_with_args(
+    def test_handle_message_with_grouping_regex(
         self, make_message_event, service_runner, tracker
     ):
 
@@ -183,7 +183,7 @@ class TestHandleEvents:
             ] ==
             tracker.handle_event.call_args_list)
 
-    def test_handle_message_with_kwargs(
+    def test_handle_message_with_named_group_regex(
         self, make_message_event, service_runner, tracker
     ):
 
