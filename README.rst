@@ -122,7 +122,8 @@ Use regular expressions to fire on matching messages only:
         def on_message_starting_with(self, event, message):
             pass
 
-Parse message and pass ``args`` or ``kwargs`` straight to entrypoint:
+Parse message and pass matching groups as positional or named arguments
+to the entrypoint:
 
 .. code:: python
 
