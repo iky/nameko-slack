@@ -32,7 +32,7 @@ def service_runner(container_factory, config):
             SlackClient.return_value.rtm_read.return_value = events
             container = container_factory(service_class, config)
             container.start()
-            sleep(0.1)
+            sleep(0.1)  # enough to handle all the test events
 
     return _runner
 
