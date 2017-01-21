@@ -341,5 +341,3 @@ def test_handlers_do_not_block(
             work_1.send()
         if not work_2.ready():
             work_2.send()
-
-    container.stop()
