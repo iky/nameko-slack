@@ -83,8 +83,8 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
-            [call(event) for event in events] ==
-            tracker.handle_event.call_args_list)
+            tracker.handle_event.call_args_list ==
+            [call(event) for event in events])
 
     def test_handle_event_by_type(self, events, service_runner, tracker):
 
@@ -99,11 +99,11 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
+            tracker.handle_event.call_args_list ==
             [
                 call(event) for event in events
                 if event.get('type') == 'presence_change'
-            ] ==
-            tracker.handle_event.call_args_list)
+            ])
 
     def test_handle_any_message(self, events, service_runner, tracker):
 
@@ -118,11 +118,11 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
+            tracker.handle_event.call_args_list ==
             [
                 call(event, event.get('text')) for event in events
                 if event.get('type') == 'message'
-            ] ==
-            tracker.handle_event.call_args_list)
+            ])
 
     def test_handle_message_matching_regex(
         self, make_message_event, service_runner, tracker
@@ -150,11 +150,11 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
+            tracker.handle_event.call_args_list ==
             [
                 call(make_message_event(text='spam ham'), 'spam ham'),
                 call(make_message_event(text='spam egg'), 'spam egg'),
-            ] ==
-            tracker.handle_event.call_args_list)
+            ])
 
     def test_handle_message_with_grouping_regex(
         self, make_message_event, service_runner, tracker
@@ -177,11 +177,11 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
+            tracker.handle_event.call_args_list ==
             [
                 call(make_message_event(text='spam 100'), 'spam 100', '100'),
                 call(make_message_event(text='spam 200'), 'spam 200', '200'),
-            ] ==
-            tracker.handle_event.call_args_list)
+            ])
 
     def test_handle_message_with_named_group_regex(
         self, make_message_event, service_runner, tracker
@@ -204,6 +204,7 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
+            tracker.handle_event.call_args_list ==
             [
                 call(
                     make_message_event(text='spam 100'),
@@ -213,8 +214,7 @@ class TestHandleEvents:
                     make_message_event(text='spam 200spam'),
                     'spam 200spam',
                     ham='200'),
-            ] ==
-            tracker.handle_event.call_args_list)
+            ])
 
     def test_multiple_handlers(
         self, events, make_message_event, service_runner, tracker
@@ -244,29 +244,29 @@ class TestHandleEvents:
         service_runner(Service, events)
 
         assert (
-            [call(event) for event in events] ==
-            tracker.handle_all_events.call_args_list)
+            tracker.handle_all_events.call_args_list ==
+            [call(event) for event in events])
 
         assert (
+            tracker.handle_presence_changes.call_args_list ==
             [
                 call(event) for event in events
                 if event.get('type') == 'presence_change'
-            ] ==
-            tracker.handle_presence_changes.call_args_list)
+            ])
 
         assert (
+            tracker.handle_all_messages.call_args_list ==
             [
                 call(event, event.get('text')) for event in events
                 if event.get('type') == 'message'
-            ] ==
-            tracker.handle_all_messages.call_args_list)
+            ])
 
         assert (
+            tracker.handle_spam_messages.call_args_list ==
             [
                 call(make_message_event(text='spam ham'), 'spam ham'),
                 call(make_message_event(text='ham spam'), 'ham spam'),
-            ] ==
-            tracker.handle_spam_messages.call_args_list)
+            ])
 
 
 @patch('nameko_slack.rtm.SlackClient')
@@ -307,11 +307,11 @@ def test_handlers_do_not_block(
 
         # both handlers are still working
         assert (
-            [] ==
-            tracker.handle_1.call_args_list)
+            tracker.handle_1.call_args_list ==
+            [])
         assert (
-            [] ==
-            tracker.handle_2.call_args_list)
+            tracker.handle_2.call_args_list ==
+            [])
 
         # finish work of the second handler
         work_2.send()
@@ -319,11 +319,11 @@ def test_handlers_do_not_block(
 
         # second handler is done
         assert (
-            [] ==
-            tracker.handle_1.call_args_list)
+            tracker.handle_1.call_args_list ==
+            [])
         assert (
-            [call({'spam': 'ham'})] ==
-            tracker.handle_2.call_args_list)
+            tracker.handle_2.call_args_list ==
+            [call({'spam': 'ham'})])
 
         # finish work of the first handler
         work_1.send()
@@ -331,11 +331,11 @@ def test_handlers_do_not_block(
 
         # first handler is done
         assert (
-            [call({'spam': 'ham'})] ==
-            tracker.handle_1.call_args_list)
+            tracker.handle_1.call_args_list ==
+            [call({'spam': 'ham'})])
         assert (
-            [call({'spam': 'ham'})] ==
-            tracker.handle_2.call_args_list)
+            tracker.handle_2.call_args_list ==
+            [call({'spam': 'ham'})])
     finally:
         if not work_1.ready():
             work_1.send()
