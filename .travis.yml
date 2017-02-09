@@ -1,0 +1,10 @@
+language: python
+python:
+  - "3.4"
+
+install:
+    - pip install -U pip setuptools
+    - pip install -U -e ".[dev]"
+
+script:
+  - make test
