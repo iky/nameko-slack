@@ -2,8 +2,8 @@
 Slack Extensions for Nameko
 ===========================
 
-.. image:: https://circleci.com/gh/iky/nameko-slack.svg?style=svg&circle-token=7089e0c7966c54f33d3b9c5d5c1cc855c6b611b0
-    :target: https://circleci.com/gh/iky/nameko-slack
+.. image:: https://travis-ci.org/iky/nameko-slack.svg?branch=master
+    :target: https://travis-ci.org/iky/nameko-slack
 
 
 `Nameko`_ extension for interaction with `Slack APIs`_. Uses
