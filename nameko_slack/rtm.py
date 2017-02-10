@@ -23,7 +23,6 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
         self.token = None
 
         self._client = None
-        self._gt = None
         self._handlers = set()
 
     def setup(self):
@@ -33,7 +32,7 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
     def start(self):
         self._register_handlers()
         self._connect()
-        self._gt = self.container.spawn_managed_thread(self.run)
+        self.container.spawn_managed_thread(self.run)
 
     def run(self):
         while True:
