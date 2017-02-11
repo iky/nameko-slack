@@ -5,12 +5,12 @@ from setuptools import setup
 
 setup(
     name='nameko-slack',
-    version='0.0.1',
+    version='0.0.2',
     description='Nameko extension for interaction with Slack APIs',
     author='Ondrej Kohout',
     author_email='ondrej.kohout@gmail.com',
     url='http://github.com/iky/nameko-slack',
-    py_modules=['nameko_slack'],
+    packages=['nameko_slack'],
     install_requires=[
         "nameko>=2.4.4",
         "slackclient>=1.0.4",
