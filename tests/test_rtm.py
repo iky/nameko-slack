@@ -1,6 +1,7 @@
 from eventlet import sleep
 from eventlet.event import Event
 from mock import call, Mock, patch
+from nameko.testing.utils import get_extension
 import pytest
 
 from nameko_slack import rtm
@@ -304,7 +305,6 @@ def test_handlers_do_not_block(
     container.start()
 
     try:
-
         # both handlers are still working
         assert (
             tracker.handle_1.call_args_list ==
@@ -341,3 +341,33 @@ def test_handlers_do_not_block(
             work_1.send()
         if not work_2.ready():
             work_2.send()
+
+
+@patch.object(rtm.RTMEventHandlerEntrypoint, 'client')
+def test_entrypoints_lifecycle(client, container_factory, config):
+
+    class Service:
+
+        name = 'sample'
+
+        @rtm.handle_event
+        def handle_event(self, event):
+            pass
+
+        @rtm.handle_message
+        def handle_message(self, event, message):
+            pass
+
+    container = container_factory(Service, config)
+
+    event_handler = get_extension(container, rtm.RTMEventHandlerEntrypoint)
+    message_handler = get_extension(
+        container, rtm.RTMMessageHandlerEntrypoint)
+
+    container.start()
+    assert call(event_handler) in client.register_provider.mock_calls
+    assert call(message_handler) in client.register_provider.mock_calls
+
+    container.stop()
+    assert call(event_handler) in client.unregister_provider.mock_calls
+    assert call(message_handler) in client.unregister_provider.mock_calls
