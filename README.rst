@@ -1,10 +1,10 @@
-===========================
-Slack Extensions for Nameko
-===========================
-
 .. image:: https://travis-ci.org/iky/nameko-slack.svg?branch=master
     :target: https://travis-ci.org/iky/nameko-slack
 
+
+===========================
+Slack Extensions for Nameko
+===========================
 
 `Nameko`_ extension for interaction with `Slack APIs`_. Uses
 `Slack Developer Kit for Python`_.
