@@ -35,6 +35,9 @@ def service_runner(container_factory, config):
             container.start()
             sleep(0.1)  # enough to handle all the test events
 
+        # return reply calls
+        return SlackClient.return_value.rtm_send_message.call_args_list
+
     return _runner
 
 
@@ -268,6 +271,25 @@ class TestHandleEvents:
                 call(make_message_event(text='spam ham'), 'spam ham'),
                 call(make_message_event(text='ham spam'), 'ham spam'),
             ])
+
+
+def test_replies_on_handle_message(events, service_runner):
+
+        class Service:
+
+            name = 'sample'
+
+            @rtm.handle_message
+            def handle_message(self, event, message):
+                return 'sure, {}'.format(message)
+
+        reply_calls = service_runner(Service, events)
+
+        assert reply_calls == [
+            call('D11', 'sure, spam ham'),
+            call('D11', 'sure, ham spam'),
+            call('D11', 'sure, spam egg'),
+        ]
 
 
 @patch('nameko_slack.rtm.SlackClient')
