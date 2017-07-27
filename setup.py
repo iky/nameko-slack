@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='nameko-slack',
-    version='0.0.2',
+    version='0.0.3',
     description='Nameko extension for interaction with Slack APIs',
     author='Ondrej Kohout',
     author_email='ondrej.kohout@gmail.com',
