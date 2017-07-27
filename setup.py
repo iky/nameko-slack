@@ -13,7 +13,7 @@ setup(
     url='http://github.com/iky/nameko-slack',
     packages=['nameko_slack'],
     install_requires=[
-        "nameko>=2.4.4",
+        "nameko>=2.2.0",
         "slackclient>=1.0.4",
     ],
     extras_require={
@@ -34,7 +34,10 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Topic :: Internet",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Intended Audience :: Developers",
