@@ -9,16 +9,20 @@ python:
   - nightly
 
 env:
-  - NAMEKO_VERSION=2.4.4
-  - NAMEKO_VERSION=2.5.0
-  - NAMEKO_VERSION=2.5.1
-  - NAMEKO_VERSION=2.5.2
-  - NAMEKO_VERSION=2.5.3
+  - NAMEKO_VERSION===2.2.0
+  - NAMEKO_VERSION===2.3.0
+  - NAMEKO_VERSION===2.4.0
+  - NAMEKO_VERSION===2.5.0
+  - NAMEKO_VERSION===2.5.1
+  - NAMEKO_VERSION===2.5.2
+  - NAMEKO_VERSION===2.5.3
+  - NAMEKO_VERSION===2.5.4
+  - NAMEKO_VERSION=>=2.6.0
 
 install:
     - pip install -U pip setuptools
     - pip install -U -e ".[dev]"
-    - pip install -U nameko==$NAMEKO_VERSION
+    - pip install -U nameko$NAMEKO_VERSION
 
 script:
   - make test
