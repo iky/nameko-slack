@@ -7,6 +7,7 @@ setup(
     name='nameko-slack',
     version='0.0.3',
     description='Nameko extension for interaction with Slack APIs',
+    long_description=open('README.rst').read(),
     author='Ondrej Kohout',
     author_email='ondrej.kohout@gmail.com',
     url='http://github.com/iky/nameko-slack',
