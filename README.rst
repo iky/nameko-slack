@@ -140,3 +140,18 @@ to the entrypoint:
         @rtm.handle_message('^egg (?P<ham>\w+)')
         def on_egg(self, event, message, ham=None):
             pass
+
+Respond back to the channel by returning a string in the message handling
+entrypoint:
+
+.. code:: python
+
+    from nameko_slack import rtm
+
+    class Service:
+
+        name = 'some-service'
+
+        @rtm.handle_message
+        def sure(self, event, message):
+            return 'sure, {}'.format(message)

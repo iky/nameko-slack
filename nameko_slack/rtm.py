@@ -1,3 +1,4 @@
+from functools import partial
 import re
 
 import eventlet
@@ -52,6 +53,9 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
         for handle_event in self._handlers:
             handle_event(event)
 
+    def reply(self, event, message):
+        self._client.rtm_send_message(event['channel'], message)
+
 
 class RTMEventHandlerEntrypoint(Entrypoint):
 
@@ -101,8 +105,16 @@ class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
                 args = (event, event.get('text'))
                 kwargs = {}
             context_data = {}
+            handle_result = partial(self.handle_result, event)
             self.container.spawn_worker(
-                self, args, kwargs, context_data=context_data)
+                self, args, kwargs,
+                context_data=context_data,
+                handle_result=handle_result)
+
+    def handle_result(self, event, worker_ctx, result, exc_info):
+        if result:
+            self.client.reply(event, result)
+        return result, exc_info
 
 
 handle_message = RTMMessageHandlerEntrypoint.decorator
