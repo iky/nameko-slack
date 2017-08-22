@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 setup(
@@ -11,7 +11,7 @@ setup(
     author='Ondrej Kohout',
     author_email='ondrej.kohout@gmail.com',
     url='http://github.com/iky/nameko-slack',
-    packages=['nameko_slack'],
+    packages=find_packages(exclude=['test', 'test.*']),
     install_requires=[
         "nameko>=2.2.0",
         "slackclient>=1.0.4",
