@@ -24,14 +24,12 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
         self.token = None
 
         self._client = None
-        self._handlers = set()
 
     def setup(self):
         config = self.container.config.get('SLACK', {})
         self.token = config.get('TOKEN')
 
     def start(self):
-        self._register_handlers()
         self._connect()
         self.container.spawn_managed_thread(self.run)
 
@@ -41,17 +39,13 @@ class SlackRTMClient(SharedExtension, ProviderCollector):
                 self.handle(event)
             eventlet.sleep(self.read_interval)
 
-    def _register_handlers(self):
-        for provider in self._providers:
-            self._handlers.add(provider.handle_event)
-
     def _connect(self):
         self._client = SlackClient(self.token)
         self._client.server.rtm_connect()
 
     def handle(self, event):
-        for handle_event in self._handlers:
-            handle_event(event)
+        for provider in self._providers:
+            provider.handle_event(event)
 
     def reply(self, event, message):
         self._client.rtm_send_message(event['channel'], message)
