@@ -1,10 +1,86 @@
 from eventlet import sleep
 from eventlet.event import Event
 from mock import call, Mock, patch
+from nameko.exceptions import ConfigurationError
 from nameko.testing.utils import get_extension
 import pytest
 
 from nameko_slack import rtm
+
+
+def test_client_manager_setup_missing_config_key():
+
+    config = {}
+
+    client_manager = rtm.SlackRTMClientManager()
+    client_manager.container = Mock(config=config)
+
+    with pytest.raises(ConfigurationError) as exc:
+        client_manager.setup()
+
+    assert str(exc.value) == '`SLACK` config key not found'
+
+
+def test_client_manager_setup_missing_mandatory_connection_keys():
+
+    config = {'SLACK': {}}
+
+    client_manager = rtm.SlackRTMClientManager()
+    client_manager.container = Mock(config=config)
+
+    with pytest.raises(ConfigurationError) as exc:
+        client_manager.setup()
+
+    assert (
+        str(exc.value) ==
+        'At least one token must be provided in `SLACK` config')
+
+
+@pytest.mark.parametrize('config', (
+    {'SLACK': {'TOKEN': 'abc-123'}},
+    {'SLACK': {'BOTS': {'default': 'abc-123'}}},
+))
+@patch('nameko_slack.rtm.SlackClient')
+def test_client_manager_setup_with_default_bot_token(
+    mocked_slack_client, config
+):
+
+    client_manager = rtm.SlackRTMClientManager()
+    client_manager.container = Mock(config=config)
+
+    client_manager.setup()
+
+    assert 'default' in client_manager.clients
+    assert (
+        client_manager.clients['default'] ==
+        mocked_slack_client.return_value)
+    assert mocked_slack_client.call_args == call('abc-123')
+
+
+@patch('nameko_slack.rtm.SlackClient')
+def test_client_manager_setup_with_multiple_bot_tokens(mocked_slack_client):
+
+    config = {
+        'SLACK': {
+            'BOTS': {
+                'spam': 'abc-123',
+                'ham': 'def-456',
+            }
+        }
+    }
+
+    client_manager = rtm.SlackRTMClientManager()
+    client_manager.container = Mock(config=config)
+
+    client_manager.setup()
+
+    assert 'spam' in client_manager.clients
+    assert 'ham' in client_manager.clients
+    assert client_manager.clients['spam'] == mocked_slack_client.return_value
+    assert client_manager.clients['ham'] == mocked_slack_client.return_value
+
+    assert call('abc-123') in mocked_slack_client.call_args_list
+    assert call('def-456') in mocked_slack_client.call_args_list
 
 
 @pytest.fixture
@@ -14,7 +90,7 @@ def tracker():
 
 @pytest.fixture
 def config():
-    return {}
+    return {rtm.CONFIG_KEY: {'TOKEN': 'abc-123'}}
 
 
 @pytest.fixture
@@ -273,6 +349,136 @@ class TestHandleEvents:
             ])
 
 
+class TestMultipleBotAccounts:
+
+    @pytest.fixture
+    def config(self):
+        return {
+            rtm.CONFIG_KEY: {
+                'BOTS': {
+                    'Alice': 'aaa-111',
+                    'Bob': 'bbb-222',
+                },
+            }
+        }
+
+    @pytest.fixture
+    def make_client(self):
+        def make(bot_name, token, events):
+            client = Mock(bot_name=bot_name, token=token)
+            client.rtm_read.return_value = events
+            return client
+        return make
+
+    @pytest.fixture
+    def service_runner(self, container_factory, config):
+
+        def _runner(service_class, clients):
+
+            clients_by_token = {client.token: client for client in clients}
+
+            with patch('nameko_slack.rtm.SlackClient') as SlackClient:
+                SlackClient.side_effect = (
+                    lambda token: clients_by_token[token])
+                container = container_factory(service_class, config)
+                container.start()
+                sleep(0.1)  # enough to handle all the test events
+
+        return _runner
+
+    def test_multiple_handlers(
+        self, events, make_client, make_message_event, service_runner, tracker
+    ):
+
+        class Service:
+
+            name = 'test'
+
+            @rtm.handle_event(bot_name='Alice')
+            def handle_all_events(self, event):
+                tracker.alice.handle_all_events(event)
+
+            @rtm.handle_event('presence_change', bot_name='Bob')
+            def handle_presence_changes(self, event):
+                tracker.bob.handle_presence_changes(event)
+
+            @rtm.handle_message(bot_name='Alice')
+            def handle_all_messages(self, event, message):
+                tracker.alice.handle_all_messages(event, message)
+
+            @rtm.handle_message('^ham', bot_name='Alice')
+            def handle_ham_messages(self, event, message):
+                tracker.alice.handle_ham_messages(event, message)
+
+            @rtm.handle_message('^spam', bot_name='Bob')
+            def handle_spam_messages(self, event, message):
+                tracker.bob.handle_spam_messages(event, message)
+
+            @rtm.handle_message('^ham', bot_name='Alice')
+            @rtm.handle_message('^spam', bot_name='Bob')
+            def handle_ham_and_spam_messages(self, event, message):
+                tracker.handle_spam_and_ham_messages(message)
+
+        alices_events = [
+            {'type': 'hello'},
+            make_message_event(text='spam ham'),
+            make_message_event(text='spam egg'),
+            {'type': 'presence_change', 'presence': 'active', 'user': 'A11'},
+            {'type': 'presence_change', 'presence': 'away', 'user': 'A00'},
+            make_message_event(text='ham spam'),
+        ]
+
+        bobs_events = [
+            {'type': 'hello'},
+            {'type': 'presence_change', 'presence': 'active', 'user': 'B11'},
+            make_message_event(text='spam ham'),
+            {'type': 'presence_change', 'presence': 'away', 'user': 'B00'},
+            make_message_event(text='ham spam'),
+            make_message_event(text='spam egg'),
+        ]
+
+        alice = make_client('Alice', 'aaa-111', alices_events)
+        bob = make_client('Bob', 'bbb-222', bobs_events)
+
+        service_runner(Service, [alice, bob])
+
+        assert (
+            tracker.alice.handle_all_events.call_args_list ==
+            [call(event) for event in alices_events])
+
+        assert (
+            tracker.bob.handle_presence_changes.call_args_list ==
+            [
+                call(event) for event in bobs_events
+                if event.get('type') == 'presence_change'
+            ])
+
+        assert (
+            tracker.alice.handle_all_messages.call_args_list ==
+            [
+                call(event, event.get('text')) for event in alices_events
+                if event.get('type') == 'message'
+            ])
+
+        assert (
+            tracker.alice.handle_ham_messages.call_args_list ==
+            [
+                call(make_message_event(text='ham spam'), 'ham spam'),
+            ])
+
+        assert (
+            tracker.bob.handle_spam_messages.call_args_list ==
+            [
+                call(make_message_event(text='spam ham'), 'spam ham'),
+                call(make_message_event(text='spam egg'), 'spam egg'),
+            ])
+
+        call_args_list = tracker.handle_spam_and_ham_messages.call_args_list
+        messages = [
+            message for args, _ in call_args_list for message in args]
+        assert sorted(messages) == ['ham spam', 'spam egg', 'spam ham']
+
+
 def test_replies_on_handle_message(events, service_runner):
 
         class Service:
@@ -365,8 +571,8 @@ def test_handlers_do_not_block(
             work_2.send()
 
 
-@patch.object(rtm.RTMEventHandlerEntrypoint, 'client')
-def test_entrypoints_lifecycle(client, container_factory, config):
+@patch.object(rtm.RTMEventHandlerEntrypoint, 'clients')
+def test_entrypoints_lifecycle(clients, container_factory, config):
 
     class Service:
 
@@ -387,9 +593,9 @@ def test_entrypoints_lifecycle(client, container_factory, config):
         container, rtm.RTMMessageHandlerEntrypoint)
 
     container.start()
-    assert call(event_handler) in client.register_provider.mock_calls
-    assert call(message_handler) in client.register_provider.mock_calls
+    assert call(event_handler) in clients.register_provider.mock_calls
+    assert call(message_handler) in clients.register_provider.mock_calls
 
     container.stop()
-    assert call(event_handler) in client.unregister_provider.mock_calls
-    assert call(message_handler) in client.unregister_provider.mock_calls
+    assert call(event_handler) in clients.unregister_provider.mock_calls
+    assert call(message_handler) in clients.unregister_provider.mock_calls

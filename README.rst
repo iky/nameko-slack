@@ -155,3 +155,39 @@ entrypoint:
         @rtm.handle_message
         def sure(self, event, message):
             return 'sure, {}'.format(message)
+
+
+Run multiple RTM bots:
+
+.. code:: yaml
+
+    # config.yml
+
+    SLACK:
+        BOTS:
+            Alice: ${ALICE_BOT_TOKEN}
+            Bob: ${BOB_BOT_TOKEN}
+
+.. code:: python
+
+    # service.py
+
+    from nameko_slack import rtm
+
+    class Service:
+
+        name = 'some-service'
+
+        @rtm.handle_message(bot_name='Alice')
+        def listen_as_alice(self, event, message):
+            pass
+
+        @rtm.handle_message(bot_name='Bob')
+        def listen_as_bob(self, event, message):
+            pass
+
+.. code::
+
+    $ ALICE_BOT_TOKEN=xoxb-aaa-111 BOB_BOT_TOKEN=xoxb-bbb-222 nameko run --config config.yaml service
+    starting services: some-service
+    ...
