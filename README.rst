@@ -196,7 +196,10 @@ Run multiple RTM bots:
 WEB API Client
 ==============
 
-A simple dependency provider wrapping Slack WEB API client.
+A simple dependency provider wrapping `Slack WEB API client`_.
+
+
+.. _Slack WEB API client: http://slackapi.github.io/python-slackclient/basic_usage.html#sending-a-message
 
 
 Usage
