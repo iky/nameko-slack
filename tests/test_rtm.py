@@ -5,7 +5,7 @@ from nameko.exceptions import ConfigurationError
 from nameko.testing.utils import get_extension
 import pytest
 
-from nameko_slack import rtm
+from nameko_slack import rtm, constants
 
 
 def test_client_manager_setup_missing_config_key():
@@ -38,7 +38,7 @@ def test_client_manager_setup_missing_mandatory_connection_keys():
 
 @pytest.mark.parametrize('config', (
     {'SLACK': {'TOKEN': 'abc-123'}},
-    {'SLACK': {'BOTS': {'default': 'abc-123'}}},
+    {'SLACK': {'BOTS': {constants.DEFAULT_BOT_NAME: 'abc-123'}}},
 ))
 @patch('nameko_slack.rtm.SlackClient')
 def test_client_manager_setup_with_default_bot_token(
@@ -50,9 +50,9 @@ def test_client_manager_setup_with_default_bot_token(
 
     client_manager.setup()
 
-    assert 'default' in client_manager.clients
+    assert constants.DEFAULT_BOT_NAME in client_manager.clients
     assert (
-        client_manager.clients['default'] ==
+        client_manager.clients[constants.DEFAULT_BOT_NAME] ==
         mocked_slack_client.return_value)
     assert mocked_slack_client.call_args == call('abc-123')
 
@@ -86,11 +86,6 @@ def test_client_manager_setup_with_multiple_bot_tokens(mocked_slack_client):
 @pytest.fixture
 def tracker():
     yield Mock()
-
-
-@pytest.fixture
-def config():
-    return {rtm.CONFIG_KEY: {'TOKEN': 'abc-123'}}
 
 
 @pytest.fixture
@@ -354,7 +349,7 @@ class TestMultipleBotAccounts:
     @pytest.fixture
     def config(self):
         return {
-            rtm.CONFIG_KEY: {
+            constants.CONFIG_KEY: {
                 'BOTS': {
                     'Alice': 'aaa-111',
                     'Bob': 'bbb-222',
