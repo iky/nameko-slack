@@ -48,8 +48,8 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
                 .format(CONFIG_KEY))
 
     def start(self):
-        self.connect()
         for bot_name, client in self.clients.items():
+            client.server.rtm_connect()
             run = partial(self.run, bot_name, client)
             self.container.spawn_managed_thread(run)
 
@@ -58,10 +58,6 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
             for event in client.rtm_read():
                 self.handle(bot_name, event)
             eventlet.sleep(self.read_interval)
-
-    def connect(self):
-        for bot_name, client in self.clients.items():
-            client.server.rtm_connect()
 
     def handle(self, bot_name, event):
         for provider in self._providers:
