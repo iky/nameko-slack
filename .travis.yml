@@ -24,7 +24,7 @@ deploy:
     condition: $TRAVIS_PYTHON_VERSION = "3.5"
 
     on:
-      branch: master
+      branch: test-deploy-2
       tags: false
       repo: iky/nameko-slack
 
