@@ -6,14 +6,10 @@ from nameko.exceptions import ConfigurationError
 from nameko.extensions import Entrypoint, ProviderCollector, SharedExtension
 from slackclient import SlackClient
 
+from nameko_slack import constants
+
 
 EVENT_TYPE_MESSAGE = 'message'
-
-
-CONFIG_KEY = 'SLACK'
-
-
-DEFAULT_BOT_NAME = 'default'
 
 
 class SlackRTMClientManager(SharedExtension, ProviderCollector):
@@ -29,15 +25,15 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
     def setup(self):
 
         try:
-            config = self.container.config[CONFIG_KEY]
+            config = self.container.config[constants.CONFIG_KEY]
         except KeyError:
             raise ConfigurationError(
-                '`{}` config key not found'.format(CONFIG_KEY))
+                '`{}` config key not found'.format(constants.CONFIG_KEY))
 
         token = config.get('TOKEN')
         clients = config.get('BOTS')
         if token:
-            self.clients[DEFAULT_BOT_NAME] = SlackClient(token)
+            self.clients[constants.DEFAULT_BOT_NAME] = SlackClient(token)
         if clients:
             for bot_name, token in clients.items():
                 self.clients[bot_name] = SlackClient(token)
@@ -45,7 +41,7 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
         if not self.clients:
             raise ConfigurationError(
                 'At least one token must be provided in `{}` config'
-                .format(CONFIG_KEY))
+                .format(constants.CONFIG_KEY))
 
     def start(self):
         for bot_name, client in self.clients.items():
@@ -74,7 +70,7 @@ class RTMEventHandlerEntrypoint(Entrypoint):
     clients = SlackRTMClientManager()
 
     def __init__(self, event_type=None, bot_name=None):
-        self.bot_name = bot_name or DEFAULT_BOT_NAME
+        self.bot_name = bot_name or constants.DEFAULT_BOT_NAME
         self.event_type = event_type
 
     def setup(self):
@@ -99,7 +95,7 @@ handle_event = RTMEventHandlerEntrypoint.decorator
 class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
 
     def __init__(self, message_pattern=None, bot_name=None):
-        self.bot_name = bot_name or DEFAULT_BOT_NAME
+        self.bot_name = bot_name or constants.DEFAULT_BOT_NAME
         if message_pattern:
             self.message_pattern = re.compile(message_pattern)
         else:

@@ -1,0 +1,2 @@
+CONFIG_KEY = 'SLACK'
+DEFAULT_BOT_NAME = 'default'

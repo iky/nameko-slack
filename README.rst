@@ -165,29 +165,112 @@ Run multiple RTM bots:
 
     SLACK:
         BOTS:
-            Alice: ${ALICE_BOT_TOKEN}
-            Bob: ${BOB_BOT_TOKEN}
+            alice: ${ALICE_BOT_TOKEN}
+            bob: ${BOB_BOT_TOKEN}
 
 .. code:: python
 
     # service.py
-
+    
     from nameko_slack import rtm
 
     class Service:
 
         name = 'some-service'
 
-        @rtm.handle_message(bot_name='Alice')
+        @rtm.handle_message(bot_name='alice')
         def listen_as_alice(self, event, message):
             pass
 
-        @rtm.handle_message(bot_name='Bob')
+        @rtm.handle_message(bot_name='bob')
         def listen_as_bob(self, event, message):
             pass
 
 .. code::
 
-    $ ALICE_BOT_TOKEN=xoxb-aaa-111 BOB_BOT_TOKEN=xoxb-bbb-222 nameko run --config config.yaml service
+    $ ALICE_BOT_TOKEN=xoxb-aaa-111 BOB_BOT_TOKEN=xoxb-bbb-222 nameko run --config ./config.yaml service
     starting services: some-service
-    ...
+
+
+
+WEB API Client
+==============
+
+A simple dependency provider wrapping `Slack WEB API client`_.
+
+
+.. _Slack WEB API client: http://slackapi.github.io/python-slackclient/basic_usage.html#sending-a-message
+
+
+Usage
+-----
+
+The dependency provider uses the same config key as the RTM extension:
+
+.. code:: yaml
+
+    # config.yml
+
+    AMQP_URI: 'pyamqp://guest:guest@localhost'
+    SLACK:
+        TOKEN: ${SLACK_BOT_TOKEN}
+
+.. code:: python
+
+    # service.py
+
+    from nameko.rpc import rpc
+    from nameko_slack import web
+
+
+    class Service:
+
+        name = 'some-service'
+
+        slack = web.Slack()
+
+        @rpc
+        def say_hello(self, name):
+            self.slack.api_call(
+                'chat.postMessage',
+                channel="#nameko",
+                text="Hello from Nameko! :tada:")
+
+
+You can also use multiple bots:
+
+.. code:: yaml
+
+    # config.yml
+
+    AMQP_URI: 'pyamqp://guest:guest@localhost'
+    SLACK:
+        BOTS:
+            alice: ${ALICE_BOT_TOKEN}
+            bob: ${BOB_BOT_TOKEN}
+
+.. code:: python
+
+    # service.py
+
+    from nameko.rpc import rpc
+    from nameko_slack import web
+
+
+    class Service:
+
+        name = 'some-service'
+
+        alice = web.Slack('alice')
+        bob = web.Slack('bob')
+
+        @rpc
+        def say_hello(self):
+            self.alice.api_call(
+                'chat.postMessage',
+                channel="#nameko",
+                text="Hello from Alice! :tada:")
+            self.bob.api_call(
+                'chat.postMessage',
+                channel="#nameko",
+                text="Hello from Bob! :tada:")
