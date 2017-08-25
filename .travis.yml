@@ -16,13 +16,35 @@ script:
   - make test
 
 deploy:
-  provider: pypi
-  user: nameko-slack
-  password:
-    secure: vQEPN4LK/cQBOAQYIqOHIQc5uc4IlzlNOM6hZ8/n9BOD5HYDXd0ZWEO2EK7D2Bl5ugD0liGS4vBlTPjdNUE8CchuEMuxramg699dFSipo8KOfLOtys7E2MQE/X0Hc6Z8hv49pCVuLFomUfhqm0jc+bLiIY0pFnz5d0WpaoeGL+dy7+NewBjOve3xh5xR4fPA8afB9y8iTe9dzLQmUDZ68MA9lYr66Y05uZLCih20/U9gt66/umISQOPsglRDov02Zzv8vZapeOxh8iESWO8Nnpp7zqsYyzY9ge4ljlvpkmhgd5jCH6B9s3eHkX56rYZn47YextHbBpI0ZBpBTB2QLo11P2tDxTux+fCdtChSJrpc/fLZ+NsiO6OV9jROf1fEGXqST0DNj7FkxXlfJ5RkBEfE1swCD2x2qaXHzFuFqdDuXRzW8EBn4KqF7GX7m5sJkZlR791DaKQkYaIqPq568vR+KPPfbwcz0mnYPJSsnwNf17K8FL1fL09ZBAOp7jsaj3VD007WVw2AfwvaN/9yPTPNd3wexD60u6h+qGU4BIovq1QtbQm8enGHGocgc+kmhgEgwoHSPBUxGXRSBu8O2+VQBDBDVARHvtmFdACIdyly6YTdzXOhcWMYiGKb6hOKlEkrKpF2fBfcGdFev9czN/M+scH60eHaZNSCtNRrlEY=
-  on:
-    branch: test-deploy
-    #tags: true
-    repo: iky/nameko-slack
-  server: https://testpypi.python.org/pypi
-  distributions: "sdist bdist_wheel"
+
+  - provider: pypi
+
+    server: https://test.pypi.org/legacy/
+
+    condition: $TRAVIS_PYTHON_VERSION = "3.5"
+
+    on:
+      branch: master
+      tags: false
+      repo: iky/nameko-slack
+
+    distributions: "sdist bdist_wheel"
+
+    user: nameko-slack
+    password:
+      secure: vQEPN4LK/cQBOAQYIqOHIQc5uc4IlzlNOM6hZ8/n9BOD5HYDXd0ZWEO2EK7D2Bl5ugD0liGS4vBlTPjdNUE8CchuEMuxramg699dFSipo8KOfLOtys7E2MQE/X0Hc6Z8hv49pCVuLFomUfhqm0jc+bLiIY0pFnz5d0WpaoeGL+dy7+NewBjOve3xh5xR4fPA8afB9y8iTe9dzLQmUDZ68MA9lYr66Y05uZLCih20/U9gt66/umISQOPsglRDov02Zzv8vZapeOxh8iESWO8Nnpp7zqsYyzY9ge4ljlvpkmhgd5jCH6B9s3eHkX56rYZn47YextHbBpI0ZBpBTB2QLo11P2tDxTux+fCdtChSJrpc/fLZ+NsiO6OV9jROf1fEGXqST0DNj7FkxXlfJ5RkBEfE1swCD2x2qaXHzFuFqdDuXRzW8EBn4KqF7GX7m5sJkZlR791DaKQkYaIqPq568vR+KPPfbwcz0mnYPJSsnwNf17K8FL1fL09ZBAOp7jsaj3VD007WVw2AfwvaN/9yPTPNd3wexD60u6h+qGU4BIovq1QtbQm8enGHGocgc+kmhgEgwoHSPBUxGXRSBu8O2+VQBDBDVARHvtmFdACIdyly6YTdzXOhcWMYiGKb6hOKlEkrKpF2fBfcGdFev9czN/M+scH60eHaZNSCtNRrlEY=
+
+  - provider: pypi
+
+    condition: $TRAVIS_PYTHON_VERSION = "3.5"
+
+    on:
+      branch: master
+      tags: true
+      repo: iky/nameko-slack
+
+    distributions: "sdist bdist_wheel"
+
+    user: nameko-slack
+    password:
+      secure: CUC4Fojc+tsnztly2UCVWKl/VfP4+mePV6P+0ZHoNN05P7gliXfgnELRcbG9gg9lVPiEg2NpF3dtcTg0XB1bFf+0vZST+XN1iPydYPnTU5wA94a4OCdnEhVtYhN2kazxpBlBArRofDaSoAsZbhoC/owBjKSEPOw0PxYJf51mvotcsMeGjj2FuhkhRWNJjkmseGOQVRGEfPyrvJDoJ4tCrDT88wDc1euZTTEeIZ19W/QvA3n5MVOntYWxMW4dPifE090ZgGSuYGt/p314UB84klYL4pZj8L94T8h4VP+IWz8B6Du9M5X6j/lhNziLfLC9ZxhL75zu2rorvK4I57cdRpCWOxa+J+Uf8QlVXgDSyyLoO+9guQj4BEpttw1EqTi++WJQKJXVv3ZvIB5u3ksSQZkCOR7rt4yvzV6ERx6FjbqfsKJDavx4utptVzs4kkdqAHq4Ei3Lq/OHN6VAFqtv8mtiUkL2gYDOqyl1LugtIV1Xn2bcA3Uykv3BJj1YULwMMoKo3xo+mQeHm4Im4fvQxR9ahW7sdTfYOlKTNl+fqz91sTT3b6gdRPl6k2CeZWAPGXcpbWR+Cl3ay1aYU/vFVm+4j2APVw5Wq8THRK7qb0lUhZKguY3GFUeM4Ly2aq4eNcrkZTX+gyvDMkkIk7QrPOF/W7seMYTnyZYagXD6Ypw=
