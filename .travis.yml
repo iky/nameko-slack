@@ -11,6 +11,9 @@ python:
 install:
   - pip install -U pip setuptools
   - pip install -U -e ".[dev]"
+  # we can't test eventlet>0.20.1 in our py27 CI environment until the fix
+  # in https://github.com/eventlet/eventlet/issues/401 is released
+  - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install eventlet==0.20.1; fi
 
 script:
   - make test
