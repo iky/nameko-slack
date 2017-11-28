@@ -21,7 +21,7 @@ setup(
             "coverage",
             "flake8",
             "pylint",
-            "pytest",
+            "pytest<3.3.0",  # pinned until option conflict solved in nameko
         ]
     },
     dependency_links=[],
