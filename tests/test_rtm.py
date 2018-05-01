@@ -594,3 +594,57 @@ def test_entrypoints_lifecycle(clients, container_factory, config):
     container.stop()
     assert call(event_handler) in clients.unregister_provider.mock_calls
     assert call(message_handler) in clients.unregister_provider.mock_calls
+
+
+def test_expected_exceptions(container_factory, config):
+
+    class Boom(Exception):
+        pass
+
+    class Service:
+
+        name = 'sample'
+
+        @rtm.handle_event(expected_exceptions=Boom)
+        def handle_event(self, event):
+            pass
+
+        @rtm.handle_message(expected_exceptions=Boom)
+        def handle_message(self, event, message):
+            pass
+
+    container = container_factory(Service, config)
+
+    event_handler = get_extension(container, rtm.RTMEventHandlerEntrypoint)
+    assert event_handler.expected_exceptions == Boom
+
+    message_handler = get_extension(
+        container, rtm.RTMMessageHandlerEntrypoint)
+    assert message_handler.expected_exceptions == Boom
+
+
+def test_sensitive_arguments(container_factory, config):
+
+    class Boom(Exception):
+        pass
+
+    class Service:
+
+        name = 'sample'
+
+        @rtm.handle_event(sensitive_arguments="event.user")
+        def handle_event(self, event):
+            pass
+
+        @rtm.handle_message(sensitive_arguments="event.user")
+        def handle_message(self, event, message):
+            pass
+
+    container = container_factory(Service, config)
+
+    event_handler = get_extension(container, rtm.RTMEventHandlerEntrypoint)
+    assert event_handler.sensitive_arguments == "event.user"
+
+    message_handler = get_extension(
+        container, rtm.RTMMessageHandlerEntrypoint)
+    assert message_handler.sensitive_arguments == "event.user"
