@@ -1,19 +1,19 @@
 #!/usr/bin/env python
 
-from setuptools import setup
+from setuptools import find_packages, setup
 
 
 setup(
     name='nameko-slack',
-    version='0.0.3',
+    version='0.0.4',
     description='Nameko extension for interaction with Slack APIs',
     long_description=open('README.rst').read(),
     author='Ondrej Kohout',
     author_email='ondrej.kohout@gmail.com',
     url='http://github.com/iky/nameko-slack',
-    packages=['nameko_slack'],
+    packages=find_packages(exclude=['test', 'test.*']),
     install_requires=[
-        "nameko>=2.4.4",
+        "nameko>=2.2.0",
         "slackclient>=1.0.4",
     ],
     extras_require={
@@ -34,7 +34,10 @@ setup(
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Topic :: Internet",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Intended Audience :: Developers",

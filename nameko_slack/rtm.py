@@ -2,73 +2,82 @@ from functools import partial
 import re
 
 import eventlet
+from nameko.exceptions import ConfigurationError
 from nameko.extensions import Entrypoint, ProviderCollector, SharedExtension
 from slackclient import SlackClient
+
+from nameko_slack import constants
 
 
 EVENT_TYPE_MESSAGE = 'message'
 
 
-class SlackRTMClient(SharedExtension, ProviderCollector):
-    """
-    Slack Real Time Messaging API Client
-
-    """
+class SlackRTMClientManager(SharedExtension, ProviderCollector):
 
     def __init__(self):
 
-        super(SlackRTMClient, self).__init__()
+        super(SlackRTMClientManager, self).__init__()
 
         self.read_interval = 1
 
-        self.token = None
-
-        self._client = None
-        self._handlers = set()
+        self.clients = {}
 
     def setup(self):
-        config = self.container.config.get('SLACK', {})
-        self.token = config.get('TOKEN')
+
+        try:
+            config = self.container.config[constants.CONFIG_KEY]
+        except KeyError:
+            raise ConfigurationError(
+                '`{}` config key not found'.format(constants.CONFIG_KEY))
+
+        token = config.get('TOKEN')
+        clients = config.get('BOTS')
+        if token:
+            self.clients[constants.DEFAULT_BOT_NAME] = SlackClient(token)
+        if clients:
+            for bot_name, token in clients.items():
+                self.clients[bot_name] = SlackClient(token)
+
+        if not self.clients:
+            raise ConfigurationError(
+                'At least one token must be provided in `{}` config'
+                .format(constants.CONFIG_KEY))
 
     def start(self):
-        self._register_handlers()
-        self._connect()
-        self.container.spawn_managed_thread(self.run)
+        for bot_name, client in self.clients.items():
+            client.server.rtm_connect()
+            run = partial(self.run, bot_name, client)
+            self.container.spawn_managed_thread(run)
 
-    def run(self):
+    def run(self, bot_name, client):
         while True:
-            for event in self._client.rtm_read():
-                self.handle(event)
+            for event in client.rtm_read():
+                self.handle(bot_name, event)
             eventlet.sleep(self.read_interval)
 
-    def _register_handlers(self):
+    def handle(self, bot_name, event):
         for provider in self._providers:
-            self._handlers.add(provider.handle_event)
+            if provider.bot_name == bot_name:
+                provider.handle_event(event)
 
-    def _connect(self):
-        self._client = SlackClient(self.token)
-        self._client.server.rtm_connect()
-
-    def handle(self, event):
-        for handle_event in self._handlers:
-            handle_event(event)
-
-    def reply(self, event, message):
-        self._client.rtm_send_message(event['channel'], message)
+    def reply(self, bot_name, event, message):
+        client = self.clients[bot_name]
+        client.rtm_send_message(event['channel'], message)
 
 
 class RTMEventHandlerEntrypoint(Entrypoint):
 
-    client = SlackRTMClient()
+    clients = SlackRTMClientManager()
 
-    def __init__(self, event_type=None):
+    def __init__(self, event_type=None, bot_name=None):
+        self.bot_name = bot_name or constants.DEFAULT_BOT_NAME
         self.event_type = event_type
 
     def setup(self):
-        self.client.register_provider(self)
+        self.clients.register_provider(self)
 
     def stop(self):
-        self.client.unregister_provider(self)
+        self.clients.unregister_provider(self)
 
     def handle_event(self, event):
         if self.event_type and event.get('type') != self.event_type:
@@ -85,7 +94,8 @@ handle_event = RTMEventHandlerEntrypoint.decorator
 
 class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
 
-    def __init__(self, message_pattern=None):
+    def __init__(self, message_pattern=None, bot_name=None):
+        self.bot_name = bot_name or constants.DEFAULT_BOT_NAME
         if message_pattern:
             self.message_pattern = re.compile(message_pattern)
         else:
@@ -113,7 +123,7 @@ class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
 
     def handle_result(self, event, worker_ctx, result, exc_info):
         if result:
-            self.client.reply(event, result)
+            self.clients.reply(self.bot_name, event, result)
         return result, exc_info
 
 
