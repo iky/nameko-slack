@@ -2,15 +2,35 @@ language: python
 
 python:
   - '2.7'
-  - '3.3'
   - '3.4'
   - '3.5'
   - '3.6'
   - nightly
 
+matrix:
+  allow_failures:
+    - python: nightly
+
+env:
+  - NAMEKO_VERSION="==2.2.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.3.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.4.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.5.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.6.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.7.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.8.0 pytest<3.3.0"
+  - NAMEKO_VERSION="==2.8.1 pytest<3.3.0"
+  - NAMEKO_VERSION===2.8.2
+  - NAMEKO_VERSION===2.8.3
+  - NAMEKO_VERSION===2.8.4
+  - NAMEKO_VERSION===2.8.5
+  - NAMEKO_VERSION===2.9.0
+  - NAMEKO_VERSION=>=2.9.1-rc0
+
 install:
   - pip install -U pip setuptools
   - pip install -U -e ".[dev]"
+  - pip install -U nameko$NAMEKO_VERSION
   # we can't test eventlet>0.20.1 in our py27 CI environment until the fix
   # in https://github.com/eventlet/eventlet/issues/401 is released
   - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install eventlet==0.20.1; fi
