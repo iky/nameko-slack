@@ -13,7 +13,7 @@ setup(
     url='http://github.com/iky/nameko-slack',
     packages=find_packages(exclude=['test', 'test.*']),
     install_requires=[
-        "nameko>=2.2.0",
+        "nameko>=2.7.0",
         "slackclient>=1.0.4",
     ],
     extras_require={
