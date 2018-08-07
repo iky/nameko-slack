@@ -20,7 +20,8 @@ env:
   - NAMEKO_VERSION===2.8.4
   - NAMEKO_VERSION===2.8.5
   - NAMEKO_VERSION===2.9.0
-  - NAMEKO_VERSION=>=2.9.1-rc0
+  - NAMEKO_VERSION=>=2.9.1
+  - NAMEKO_VERSION=>=2.10.0
 
 install:
   - pip install -U pip setuptools
