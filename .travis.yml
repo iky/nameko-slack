@@ -20,7 +20,7 @@ env:
   - NAMEKO_VERSION===2.8.4
   - NAMEKO_VERSION===2.8.5
   - NAMEKO_VERSION===2.9.0
-  - NAMEKO_VERSION=>=2.9.1
+  - NAMEKO_VERSION===2.9.1
   - NAMEKO_VERSION=>=2.10.0
 
 install:
@@ -41,7 +41,7 @@ deploy:
     on:
       tags: true
       repo: iky/nameko-slack
-      condition: $TRAVIS_PYTHON_VERSION = "3.5"
+      condition: $TRAVIS_PYTHON_VERSION = "3.5" AND $NAMEKO_VERSION = "==2.9.1"
 
     distributions: "sdist bdist_wheel"
 
