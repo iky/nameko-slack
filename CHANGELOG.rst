@@ -1,10 +1,18 @@
 Release Notes
 =============
 
+Version 0.0.5
+-------------
+
+Released 2018-08-07
+
+* Allow entrypoints to accept ``expected_exceptions`` and ``sensitive_arguments``
+
+
 Version 0.0.4
 -------------
 
-Release 2017-08-25
+Released 2017-08-25
 
 * Adds Web API dependency provider
 * Adds multi-bot support for RTM extension and Web API dependency provider
