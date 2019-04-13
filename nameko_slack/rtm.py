@@ -8,11 +8,10 @@ from nameko.extensions import Entrypoint, ProviderCollector, SharedExtension
 from nameko_slack import constants
 from slackclient import SlackClient
 
-EVENT_TYPE_MESSAGE = 'message'
+EVENT_TYPE_MESSAGE = "message"
 
 
 class SlackRTMClientManager(SharedExtension, ProviderCollector):
-
     def __init__(self):
 
         super(SlackRTMClientManager, self).__init__()
@@ -27,10 +26,11 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
             config = self.container.config[constants.CONFIG_KEY]
         except KeyError:
             raise ConfigurationError(
-                '`{}` config key not found'.format(constants.CONFIG_KEY))
+                "`{}` config key not found".format(constants.CONFIG_KEY)
+            )
 
-        token = config.get('TOKEN')
-        clients = config.get('BOTS')
+        token = config.get("TOKEN")
+        clients = config.get("BOTS")
         if token:
             self.clients[constants.DEFAULT_BOT_NAME] = SlackClient(token)
         if clients:
@@ -39,8 +39,10 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
 
         if not self.clients:
             raise ConfigurationError(
-                'At least one token must be provided in `{}` config'
-                .format(constants.CONFIG_KEY))
+                "At least one token must be provided in `{}` config".format(
+                    constants.CONFIG_KEY
+                )
+            )
 
     def start(self):
         for bot_name, client in self.clients.items():
@@ -61,7 +63,7 @@ class SlackRTMClientManager(SharedExtension, ProviderCollector):
 
     def reply(self, bot_name, event, message):
         client = self.clients[bot_name]
-        client.rtm_send_message(event['channel'], message)
+        client.rtm_send_message(event["channel"], message)
 
 
 class RTMEventHandlerEntrypoint(Entrypoint):
@@ -80,20 +82,18 @@ class RTMEventHandlerEntrypoint(Entrypoint):
         self.clients.unregister_provider(self)
 
     def handle_event(self, event):
-        if self.event_type and event.get('type') != self.event_type:
+        if self.event_type and event.get("type") != self.event_type:
             return
         args = (event,)
         kwargs = {}
         context_data = {}
-        self.container.spawn_worker(
-            self, args, kwargs, context_data=context_data)
+        self.container.spawn_worker(self, args, kwargs, context_data=context_data)
 
 
 handle_event = RTMEventHandlerEntrypoint.decorator
 
 
 class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
-
     def __init__(self, message_pattern=None, **kwargs):
         if message_pattern:
             self.message_pattern = re.compile(message_pattern)
@@ -102,24 +102,27 @@ class RTMMessageHandlerEntrypoint(RTMEventHandlerEntrypoint):
         super(RTMMessageHandlerEntrypoint, self).__init__(**kwargs)
 
     def handle_event(self, event):
-        if event.get('type') == EVENT_TYPE_MESSAGE:
+        if event.get("type") == EVENT_TYPE_MESSAGE:
             if self.message_pattern:
-                match = self.message_pattern.match(event.get('text', ''))
+                match = self.message_pattern.match(event.get("text", ""))
                 if match:
                     kwargs = match.groupdict()
                     args = () if kwargs else match.groups()
-                    args = (event, event.get('text')) + args
+                    args = (event, event.get("text")) + args
                 else:
                     return
             else:
-                args = (event, event.get('text'))
+                args = (event, event.get("text"))
                 kwargs = {}
             context_data = {}
             handle_result = partial(self.handle_result, event)
             self.container.spawn_worker(
-                self, args, kwargs,
+                self,
+                args,
+                kwargs,
                 context_data=context_data,
-                handle_result=handle_result)
+                handle_result=handle_result,
+            )
 
     def handle_result(self, event, worker_ctx, result, exc_info):
         if result:
