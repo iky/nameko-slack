@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import nameko
 import pytest
 from mock import Mock
 from nameko.containers import ServiceContainer
@@ -27,12 +28,26 @@ def make_slack_provider(config):
             def dummy(self):
                 pass
 
-        container = ServiceContainer(Service, config or default_config)
-        containers.append(container)
+        config = config or default_config
+        try:
+            patch = nameko.config.patch(config)
+        except AttributeError:  # Nameko 2.X
+            patch = None
+            container = ServiceContainer(Service, config)
+        else:  # Nameko 3.X
+            patch.start()
+            container = ServiceContainer(Service)
+
+        containers.append((container, patch))
 
         return get_extension(container, Slack)
 
     yield factory
+
+    for _, patch in containers:
+        _.kill()
+        if patch:
+            patch.stop()
 
     del containers[:]
 

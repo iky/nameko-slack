@@ -15,13 +15,13 @@ env:
   - NAMEKO_VERSION="==2.7.0 pytest<3.3.0"
   - NAMEKO_VERSION="==2.8.0 pytest<3.3.0"
   - NAMEKO_VERSION="==2.8.1 pytest<3.3.0"
-  - NAMEKO_VERSION===2.8.2
-  - NAMEKO_VERSION===2.8.3
-  - NAMEKO_VERSION===2.8.4
   - NAMEKO_VERSION===2.8.5
   - NAMEKO_VERSION===2.9.0
   - NAMEKO_VERSION===2.9.1
-  - NAMEKO_VERSION=>=2.10.0
+  - NAMEKO_VERSION===2.10.0
+  - NAMEKO_VERSION===2.11.0
+  - NAMEKO_VERSION=>=2.12.0
+  - NAMEKO_VERSION===3.0.0-rc6
 
 install:
   - pip install -U pip setuptools
