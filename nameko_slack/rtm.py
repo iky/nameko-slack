@@ -1,13 +1,12 @@
-from functools import partial
+# -*- coding: utf-8 -*-
 import re
+from functools import partial
 
 import eventlet
 from nameko.exceptions import ConfigurationError
 from nameko.extensions import Entrypoint, ProviderCollector, SharedExtension
-from slackclient import SlackClient
-
 from nameko_slack import constants
-
+from slackclient import SlackClient
 
 EVENT_TYPE_MESSAGE = 'message'
 

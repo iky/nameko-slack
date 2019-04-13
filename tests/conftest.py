@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pytest
 from nameko_slack import constants
 

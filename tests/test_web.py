@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
+import pytest
 from mock import Mock
 from nameko.containers import ServiceContainer
 from nameko.exceptions import ConfigurationError
 from nameko.testing.services import dummy
 from nameko.testing.utils import get_extension
-import pytest
-
 from nameko_slack import constants
 from nameko_slack.web import Slack
 

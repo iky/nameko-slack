@@ -1,11 +1,11 @@
+# -*- coding: utf-8 -*-
+import pytest
 from eventlet import sleep
 from eventlet.event import Event
-from mock import call, Mock, patch
+from mock import Mock, call, patch
 from nameko.exceptions import ConfigurationError
 from nameko.testing.utils import get_extension
-import pytest
-
-from nameko_slack import rtm, constants
+from nameko_slack import constants, rtm
 
 
 def test_client_manager_setup_missing_config_key():
@@ -239,7 +239,7 @@ class TestHandleEvents:
 
             name = 'sample'
 
-            @rtm.handle_message('^spam (\d+)')
+            @rtm.handle_message('^spam (\\d+)')
             def handle_event(self, event, message, number):
                 tracker.handle_event(event, message, number)
 
@@ -266,7 +266,7 @@ class TestHandleEvents:
 
             name = 'sample'
 
-            @rtm.handle_message('^spam (?P<ham>\d+)(\w*)')
+            @rtm.handle_message('^spam (?P<ham>\\d+)(\\w*)')
             def handle_event(self, event, message, ham):
                 tracker.handle_event(event, message, ham=ham)
 
@@ -476,21 +476,21 @@ class TestMultipleBotAccounts:
 
 def test_replies_on_handle_message(events, service_runner):
 
-        class Service:
+    class Service:
 
-            name = 'sample'
+        name = 'sample'
 
-            @rtm.handle_message
-            def handle_message(self, event, message):
-                return 'sure, {}'.format(message)
+        @rtm.handle_message
+        def handle_message(self, event, message):
+            return 'sure, {}'.format(message)
 
-        reply_calls = service_runner(Service, events)
+    reply_calls = service_runner(Service, events)
 
-        assert reply_calls == [
-            call('D11', 'sure, spam ham'),
-            call('D11', 'sure, ham spam'),
-            call('D11', 'sure, spam egg'),
-        ]
+    assert reply_calls == [
+        call('D11', 'sure, spam ham'),
+        call('D11', 'sure, ham spam'),
+        call('D11', 'sure, spam egg'),
+    ]
 
 
 @patch('nameko_slack.rtm.SlackClient')
