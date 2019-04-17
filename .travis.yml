@@ -7,11 +7,6 @@ python:
   - '3.5'
   - '3.6'
   - '3.7'
-  - nightly
-
-matrix:
-  allow_failures:
-    - python: nightly
 
 env:
   - NAMEKO_VERSION="==2.7.0 pytest<3.3.0"
