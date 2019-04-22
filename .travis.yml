@@ -28,6 +28,7 @@ jobs:
   include:
   - python: 3.6
     stage: static
+    install: pip install pre-commit
     script: make static
     env:
 
