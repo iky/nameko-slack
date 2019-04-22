@@ -20,6 +20,7 @@ setup(
         'dev': [
             "coverage",
             "flake8",
+            "isort",
             "pylint",
             "pytest",
         ]
