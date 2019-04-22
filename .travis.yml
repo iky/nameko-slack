@@ -19,7 +19,7 @@ env:
   - NAMEKO_VERSION="==2.8.1 pytest<3.3.0"
   - NAMEKO_VERSION="==2.8.0 pytest<3.3.0"
   - NAMEKO_VERSION="==2.7.0 pytest<3.3.0"
- 
+
 stages:
   - static
   - test
@@ -29,7 +29,7 @@ jobs:
   - python: 3.6
     stage: static
     script: make static
-    env: 
+    env:
 
 install:
   - pip install -U pip setuptools
