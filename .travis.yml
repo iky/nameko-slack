@@ -3,10 +3,10 @@ language: python
 dist: xenial
 
 python:
-  - '2.7'
-  - '3.5'
-  - '3.6'
-  - '3.7'
+  - 2.7
+  - 3.5
+  - 3.6
+  - 3.7
 
 env:
   - NAMEKO_VERSION="==2.7.0 pytest<3.3.0"
@@ -19,6 +19,16 @@ env:
   - NAMEKO_VERSION===2.11.0
   - NAMEKO_VERSION=>=2.12.0
   - NAMEKO_VERSION===3.0.0-rc6
+ 
+stages:
+  - static
+  - test
+
+jobs:
+  include:
+  - python: 3.6
+    stage: static
+    script: make static
 
 install:
   - pip install -U pip setuptools
@@ -29,7 +39,7 @@ install:
   - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install eventlet==0.20.1; fi
 
 script:
-  - make test
+  - make pytest
 
 deploy:
 
