@@ -3,10 +3,10 @@ language: python
 dist: xenial
 
 python:
-  - 2.7
-  - 3.5
-  - 3.6
   - 3.7
+  - 3.6
+  - 3.5
+  - 2.7
 
 env:
   - NAMEKO_VERSION===3.0.0-rc6
@@ -29,6 +29,7 @@ jobs:
   - python: 3.6
     stage: static
     script: make static
+    env: 
 
 install:
   - pip install -U pip setuptools
