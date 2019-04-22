@@ -5,8 +5,10 @@ from functools import partial
 import eventlet
 from nameko.exceptions import ConfigurationError
 from nameko.extensions import Entrypoint, ProviderCollector, SharedExtension
-from nameko_slack import constants
 from slackclient import SlackClient
+
+from nameko_slack import constants
+
 
 EVENT_TYPE_MESSAGE = "message"
 

@@ -3,6 +3,7 @@
 
 from setuptools import find_packages, setup
 
+
 setup(
     name='nameko-slack',
     version='0.0.5',
@@ -21,6 +22,7 @@ setup(
             "coverage",
             "flake8",
             "isort",
+            "pre-commit",
             "pylint",
             "pytest",
         ]

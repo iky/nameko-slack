@@ -5,6 +5,7 @@ from eventlet.event import Event
 from mock import Mock, call, patch
 from nameko.exceptions import ConfigurationError
 from nameko.testing.utils import get_extension
+
 from nameko_slack import constants, rtm
 
 

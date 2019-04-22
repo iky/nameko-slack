@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 from nameko.exceptions import ConfigurationError
 from nameko.extensions import DependencyProvider
-from nameko_slack import constants
 from slackclient import SlackClient
+
+from nameko_slack import constants
 
 
 class Slack(DependencyProvider):
