@@ -30,24 +30,24 @@ def make_slack_provider(config):
 
         config = config or default_config
         try:
-            patch = nameko.config.patch(config)
+            config_patch = nameko.config.patch(config)
         except AttributeError:  # Nameko 2.X
-            patch = None
+            config_patch = None
             container = ServiceContainer(Service, config)
         else:  # Nameko 3.X
-            patch.start()
+            config_patch.start()
             container = ServiceContainer(Service)
 
-        containers.append((container, patch))
+        containers.append((container, config_patch))
 
         return get_extension(container, Slack)
 
     yield factory
 
-    for _, patch in containers:
-        _.kill()
-        if patch:
-            patch.stop()
+    for container, config_patch in containers:
+        container.kill()
+        if config_patch:
+            config_patch.stop()
 
     del containers[:]
 
