@@ -1,10 +1,7 @@
-test: flake8 pylint pytest
+test: static pytest
 
-flake8:
-	flake8 nameko_slack tests
-
-pylint:
-	pylint nameko_slack -E
+static:
+	pre-commit run --all-files
 
 pytest:
 	coverage run --concurrency=eventlet --source nameko_slack --branch -m pytest tests

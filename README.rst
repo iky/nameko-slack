@@ -171,7 +171,7 @@ Run multiple RTM bots:
 .. code:: python
 
     # service.py
-    
+
     from nameko_slack import rtm
 
     class Service:

@@ -1,38 +1,60 @@
 language: python
 
-python:
-  - '2.7'
-  - '3.4'
-  - '3.5'
-  - '3.6'
-  - nightly
+dist: xenial
+
+stages:
+  - static
+  - test
+
+jobs:
+  include:
+  - python: 3.6
+    env: DEPS="--pre nameko"
+  - python: 3.6
+    env: DEPS="nameko>=2.12.0"
+  - python: 3.6
+    env: DEPS="nameko==2.11.0"
+  - python: 3.6
+    env: DEPS="nameko==2.10.0"
+  - python: 3.6
+    env: DEPS="nameko==2.9.1"
+  - python: 3.6
+    env: DEPS="nameko==2.9.0"
+  - python: 3.6
+    env: DEPS="nameko==2.8.5"
+  - python: 3.6
+    env: DEPS="nameko==2.8.1 pytest<3.3.0"
+  - python: 3.6
+    env: DEPS="nameko==2.8.0 pytest<3.3.0"
+  - python: 3.6
+    env: DEPS="nameko==2.7.0 pytest<3.3.0"
+  - python: 3.7
+    env: DEPS="nameko>=2.12.0"
+  - python: 3.5
+    env: DEPS="nameko>=2.12.0"
+  - python: 2.7
+    env: DEPS="nameko>=2.12.0"
+  - python: 3.6
+    stage: static
+    install: pip install pre-commit
+    script: make static
+    env:
 
 matrix:
   allow_failures:
-    - python: nightly
-
-env:
-  - NAMEKO_VERSION="==2.7.0 pytest<3.3.0"
-  - NAMEKO_VERSION="==2.8.0 pytest<3.3.0"
-  - NAMEKO_VERSION="==2.8.1 pytest<3.3.0"
-  - NAMEKO_VERSION===2.8.2
-  - NAMEKO_VERSION===2.8.3
-  - NAMEKO_VERSION===2.8.4
-  - NAMEKO_VERSION===2.8.5
-  - NAMEKO_VERSION===2.9.0
-  - NAMEKO_VERSION===2.9.1
-  - NAMEKO_VERSION=>=2.10.0
+    - python: 3.6
+      env: DEPS="--pre nameko"
 
 install:
   - pip install -U pip setuptools
   - pip install -U -e ".[dev]"
-  - pip install -U nameko$NAMEKO_VERSION
+  - pip install -U $DEPS
   # we can't test eventlet>0.20.1 in our py27 CI environment until the fix
   # in https://github.com/eventlet/eventlet/issues/401 is released
   - if [[ $TRAVIS_PYTHON_VERSION == 2* ]]; then travis_retry pip install eventlet==0.20.1; fi
 
 script:
-  - make test
+  - make pytest
 
 deploy:
 
