@@ -13,7 +13,7 @@ setup(
     author_email="ondrej.kohout@gmail.com",
     url="http://github.com/iky/nameko-slack",
     packages=find_packages(exclude=["test", "test.*"]),
-    install_requires=["nameko>=2.7.0", "slackclient>=1.0.4"],
+    install_requires=["nameko>=2.7.0", "slackclient==1.0.4"],
     extras_require={
         "dev": ["coverage", "flake8", "isort", "pre-commit", "pylint", "pytest"]
     },
