@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="nameko-slack",
-    version="0.0.5",
+    version="0.0.6",
     description="Nameko extension for interaction with Slack APIs",
     long_description=open("README.rst").read(),
     author="Ondrej Kohout",
@@ -14,9 +14,7 @@ setup(
     url="http://github.com/iky/nameko-slack",
     packages=find_packages(exclude=["test", "test.*"]),
     install_requires=["nameko>=2.7.0", "slackclient>=1.0.4,<2"],
-    extras_require={
-        "dev": ["coverage", "flake8", "isort", "pre-commit", "pylint", "pytest"]
-    },
+    extras_require={"dev": ["coverage", "pre-commit", "pylint", "pytest"]},
     dependency_links=[],
     zip_safe=True,
     license="Apache License, Version 2.0",

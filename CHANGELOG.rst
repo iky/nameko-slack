@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+Version 0.0.6
+-------------
+
+Released 2019-10-09
+
+* Temporarily lock compatibility with slack-client to < 2
+
+
 Version 0.0.5
 -------------
 
