@@ -1,4 +1,4 @@
-.. image:: https://travis-ci.org/iky/nameko-slack.svg?branch=master
+.. image:: https://api.travis-ci.org/iky/nameko-slack.svg?branch=master
     :target: https://travis-ci.org/iky/nameko-slack
 
 
