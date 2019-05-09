@@ -39,6 +39,20 @@ jobs:
     install: pip install -U -e ".[dev]"
     script: make static
     env:
+  - python: 3.6
+    stage: deploy
+    install:
+    - pip install -U pip setuptools
+    - pip install -U -e ".[dev]"
+    deploy:
+      provider: pypi
+      on:
+        tags: true
+        repo: iky/nameko-slack
+      distributions: "sdist bdist_wheel"
+      user: iky
+      password:
+        secure: dtxpnyaIjqiZwsPLa14AfLsukswKWuYzBrX1ctJ63aKtpyU2QoJBTal3peEZbgofj2qdirIXFs63Z7kUvoarfHTWlFfof7kyJhtyU5aaP3p6zUs37+Sa7oiD79r29fB2wFCjUnDaD6XLN2a3y19jTlHvsAG8iwfNUYzFbMJm1AT1FiqKb98NXRp8bkwMm0CpwgU7Nr7kAJ3719YRrmiQCb7yf5lyxclyMv1hktmjuN8QLHnLOIIR6jJV4jvfFA/tNxniC9CSpYwJFbUt9LJAFX4v+z+eqiENKp2Uo7cJsnnIXSObWPfZnETi3qpn2XtULPk0x7CMEaOBAFWeYdONRn2bdCf1NWtnFCpJfc+EcOAr4Gqn0vfzCw1toGx4AI25fmtNKDMfXcWS7PhFiztBT+CDRV8eFt4dM2bMhMQliY8Cj/mIe9mgCCwbgDIEH0r9/Su5MAWFmA7Z4smdDAQUH6cwbIfzmlbOB62oFcR2tedkJ5OC9YNWgvLn66Nv8AvyWqoKTJe0cb4/+mMNQcrhDu5oXiy7aeiSwUuBrpKlHv3ohZHR8LuaU6YqOwcJ7vQYPmrHgUO2YhjBpqe4bBKk6NrJJ9XVWMhHkENqvGQsuV2fqtJdTP8tlQ259LCgVCNfbcCwPXmLZ7v0iO93rgk4O2q8ukoyfMsLPeu5gm/KJvs=
 
 matrix:
   allow_failures:
@@ -55,18 +69,3 @@ install:
 
 script:
   - make pytest
-
-deploy:
-
-  - provider: pypi
-
-    on:
-      tags: true
-      repo: iky/nameko-slack
-      condition: $TRAVIS_PYTHON_VERSION = "3.5" AND $NAMEKO_VERSION = "==2.9.1"
-
-    distributions: "sdist bdist_wheel"
-
-    user: iky
-    password:
-      secure: dtxpnyaIjqiZwsPLa14AfLsukswKWuYzBrX1ctJ63aKtpyU2QoJBTal3peEZbgofj2qdirIXFs63Z7kUvoarfHTWlFfof7kyJhtyU5aaP3p6zUs37+Sa7oiD79r29fB2wFCjUnDaD6XLN2a3y19jTlHvsAG8iwfNUYzFbMJm1AT1FiqKb98NXRp8bkwMm0CpwgU7Nr7kAJ3719YRrmiQCb7yf5lyxclyMv1hktmjuN8QLHnLOIIR6jJV4jvfFA/tNxniC9CSpYwJFbUt9LJAFX4v+z+eqiENKp2Uo7cJsnnIXSObWPfZnETi3qpn2XtULPk0x7CMEaOBAFWeYdONRn2bdCf1NWtnFCpJfc+EcOAr4Gqn0vfzCw1toGx4AI25fmtNKDMfXcWS7PhFiztBT+CDRV8eFt4dM2bMhMQliY8Cj/mIe9mgCCwbgDIEH0r9/Su5MAWFmA7Z4smdDAQUH6cwbIfzmlbOB62oFcR2tedkJ5OC9YNWgvLn66Nv8AvyWqoKTJe0cb4/+mMNQcrhDu5oXiy7aeiSwUuBrpKlHv3ohZHR8LuaU6YqOwcJ7vQYPmrHgUO2YhjBpqe4bBKk6NrJJ9XVWMhHkENqvGQsuV2fqtJdTP8tlQ259LCgVCNfbcCwPXmLZ7v0iO93rgk4O2q8ukoyfMsLPeu5gm/KJvs=
